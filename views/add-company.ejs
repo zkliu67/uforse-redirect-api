@@ -1,0 +1,20 @@
+<%- include('./includes/header.ejs') %> 
+<body>
+  <form method="POST" action="/admin/add-company">
+    <div>
+      <label>Company Name</label>
+      <input type="text" name="companyName" id="companyName" >
+    </div>
+    <div>
+      <label>Start at</label>
+      <input type="date" name="startAt" id="startAt" >
+    </div>
+    <div>
+      <label>End at</label>
+      <input type="date" name="endAt" id="endAt" >
+    </div>
+    <button type="submit">Add</button>
+  </form>
+</body>
+
+<%- include('./includes/end.ejs') %>
