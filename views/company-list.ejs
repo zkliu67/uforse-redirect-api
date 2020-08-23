@@ -1,6 +1,36 @@
-<%- include('./includes/header.ejs') %> 
+  <%- include('./includes/header.ejs') %>
+  <link rel="stylesheet" href="/css/companies.css">
+</head> 
 <body>
   <h1>Company Lists</h1>
+  <% if (companies.length > 0) { %> 
+  <table>
+    <tr>
+      <th>Company Name</th>
+      <th>Start At</th>
+      <th>End At</th>
+      <th>Total records</th>
+      <th></th>
+    </tr>
+    <% for (let company of companies) { %> 
+      <tr>
+        <td><%= company.companyName %></td>
+        <td><%= moment(company.startDate).format('MM-DD-YYYY') %></td>
+        <td>
+          <% if (company.endDate) { %> 
+            <%= moment(company.endDate).format('MM-DD-YYYY') %>
+          <% } %> 
+        </td>
+        <td><%= company.totalRecords %></td>
+        <td>
+          <a href="/admin/report/<%- company._id %> ">Monthly Report</a>
+        </td>
+      </tr>
+    <% } %> 
+  </table>
+<% } else { %>
+  <h1>No company right now.</h1>
+<% } %>  
 </body>
 
 <%- include('./includes/end.ejs') %> 

@@ -4,20 +4,26 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    // "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js",
+    "test": "mocha"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
+    "chai": "^4.2.0",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
     "hpp": "^0.2.3",
     "http": "0.0.1-security",
+    "http-status": "^1.4.2",
+    "mocha": "^8.1.1",
+    "moment": "^2.27.0",
     "mongoose": "^5.10.0",
     "nodemon": "^2.0.4",
+    "pdfkit": "^0.11.0",
     "request-ip": "^2.1.3"
   }
 }

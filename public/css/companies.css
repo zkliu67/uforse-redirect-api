@@ -1,0 +1,27 @@
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #eeeeee;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+table form {
+  margin-block-end: 0 !important;
+}
+
+.report-button {
+  border: none;
+  color: blue;
+  background-color: transparent;
+  cursor: pointer;
+  text-decoration: underline;
+}
