@@ -33,7 +33,7 @@ app.use(hpp());
 //   .catch(err => console.error.bind(console, `MongoDB connection error: ${JSON.stringify(err)}`));
 
 // Database Connection
-const mongo_url = process.env.MONGODB_URI ? process.env.MONGODB_URI : require('./config/keys').mongoURI;
+const mongo_url = process.env.MONGODB_URI === "true" ? `mongodb+srv://admin:${process.env.DB_PASSWORD}@shop.wyugv.mongodb.net/${process.env.TB_NAME}?retryWrites=true&w=majority` : require('./config/keys').mongoURI;
 mongoose
   .connect(mongo_url, {
     useNewUrlParser: true,
