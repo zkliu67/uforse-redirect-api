@@ -1,29 +1,18 @@
 const fs = require('fs');
 const path = require('path');
 
-exports.generateReport = (res, pdfDoc, company) => {
-  const reportName = getReportName(company);
-  const reportPath = path.join('data', 'reports', reportName);
-
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader(
-    'Content-Disposition',
-    'inline; filename="' + reportName + '"'
-  );
+exports.generateReport = (pdfDoc, company) => {
 
   generateHeader(pdfDoc);
   generateCompanyInfo(pdfDoc, company);
-  generateReportTable(pdfDoc, company);
+  generateReportTable(pdfDoc, company.monthlyReport);
   generateFooter(pdfDoc);
   
   pdfDoc.end();
-
-  pdfDoc.pipe(fs.createWriteStream(reportPath));
-  pdfDoc.pipe(res);
-
+  return pdfDoc;
 }
 
-function getReportName(company) {
+exports.getReportName = (company) => {
   const date = new Date();
   let month = date.getMonth() + 1;
   month = month < 10 ? '0'+month : month;
@@ -53,7 +42,18 @@ function generateHeader(doc) {
     .text("Toronto, On, CA", 200, 80, { align: "right" })
 }
 
-function generateReportTable(doc, company) {
+function generateReportTable(doc, monthlyReport) {
+  let i = 0,
+    reportTableTop = 165;
+  
+  monthlyReport.forEach((value, key) => {
+    const recordTop = reportTableTop + 15*i;
+    i++;
+    doc
+      .text(key, 50, recordTop)
+      .text(value, 150, recordTop)
+      .moveDown()
+  })
 }
 
 function generateFooter(doc) {

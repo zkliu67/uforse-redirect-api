@@ -3,6 +3,7 @@
 </head> 
 <body>
   <h1>Company Lists</h1>
+  <a href="/admin/report">Total Report</a>
   <% if (companies.length > 0) { %> 
   <table>
     <tr>
@@ -10,6 +11,7 @@
       <th>Start At</th>
       <th>End At</th>
       <th>Total records</th>
+      <th></th>
       <th></th>
     </tr>
     <% for (let company of companies) { %> 
@@ -23,7 +25,12 @@
         </td>
         <td><%= company.totalRecords %></td>
         <td>
-          <a href="/admin/report/<%- company._id %> ">Monthly Report</a>
+          <a href="/admin/report/<%- company._id %>">Monthly Report</a>
+        </td>
+        <td>
+          <form method="POST" action="/admin/email/<%- company._id %>">
+            <button type="submit">Send Email</button>
+          </form>
         </td>
       </tr>
     <% } %> 
