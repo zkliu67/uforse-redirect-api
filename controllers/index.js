@@ -1,4 +1,5 @@
 const Company = require('../models/company');
+const Visit = require('../models/vist');
 const { sendError } = require('../helper/errorHelper');
 const HttpStatus = require('http-status');
 
@@ -9,15 +10,13 @@ exports.jumpTo = async (req, res, next) => {
     const company = await Company.findById(companyId);
 
     if (company != null && company.isValid) {
-      const record = {
-        isSucceed: true,
-        enterAt: new Date()
-      };
-
-      company.records.push(record);
-      await company.save();
-      // return res.redirect('/admin/all-companies')
-      return res.redirect('https://www.uforse.com')
+      const visit = new Visit({
+        companyId: company,
+        visitAt: new Date()
+      })
+      await visit.save();
+      return res.redirect('/admin/all-companies')
+      // return res.redirect('https://www.uforse.com')
     }
     else {
       sendError(res, HttpStatus.UNAUTHORIZED, null, 'Invalid company');

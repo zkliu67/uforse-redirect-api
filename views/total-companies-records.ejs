@@ -1,0 +1,29 @@
+<%- include('./includes/header.ejs') %>
+<link rel="stylesheet" href="/css/companies.css">
+</head> 
+<body>
+<h1>Total Records</h1>
+<table>
+  <tr>
+    <th>Date</th>
+    <% for (let company of companies) { %> 
+    <th><%= company.companyName %></th>
+    <% } %> 
+    <th>Total</th>
+  </tr>
+  <% for (let dailyVisit of dailyCompanyVisits) { %>
+    <tr>
+      <td><%= dailyVisit.date %></td>
+      <% for (let company of companies) { %> 
+        <td>
+          <%= dailyVisit.dailyVisits[company.companyName] ? dailyVisit.dailyVisits[company.companyName] : 0 %> 
+        </td>
+      <% } %> 
+      <td><%= dailyVisit.dailyTotal %></td>
+    </tr>
+  <% } %>
+</table> 
+<p>Total: <%= totalVisits.length %></p>
+</body>
+
+<%- include('./includes/end.ejs') %> 

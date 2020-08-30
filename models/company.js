@@ -6,6 +6,19 @@ const companySchema = new Schema({
     type: String,
     required: true
   },
+  contactName: {
+    type: String,
+    required: true
+  },
+  contactPhone: {
+    type: String
+  },
+  contactEmail: {
+    type: String
+  },
+  contactAddress: {
+    type: String
+  },
   startDate: {
     type: Date,
     required: true
@@ -14,16 +27,9 @@ const companySchema = new Schema({
     type: Date,
     required: false
   },
-  records: [{
-    isSucceed: {
-      type: Boolean, 
-      required: true
-    },
-    enterAt: {
-      type: Date,
-      required: true
-    }
-  }],
+  redirectLink: {
+    type: String
+  },
   isValid: {
     type: Boolean, 
     required: true,

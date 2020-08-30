@@ -4,7 +4,7 @@
 <body>
   <h1>Company Lists</h1>
   <a href="/admin/report">Total Report</a>
-  <% if (companies.length > 0) { %> 
+  <% if (allVisits.length > 0) { %> 
   <table>
     <tr>
       <th>Company Name</th>
@@ -14,16 +14,16 @@
       <th></th>
       <th></th>
     </tr>
-    <% for (let company of companies) { %> 
+    <% for (let {company, totalVisits} of allVisits) { %> 
       <tr>
-        <td><%= company.companyName %></td>
+        <td><a href="/admin/company/<%= company._id %>"><%= company.companyName %></a></td>
         <td><%= moment(company.startDate).format('MM-DD-YYYY') %></td>
         <td>
           <% if (company.endDate) { %> 
             <%= moment(company.endDate).format('MM-DD-YYYY') %>
           <% } %> 
         </td>
-        <td><%= company.totalRecords %></td>
+        <td><%= totalVisits %></td>
         <td>
           <a href="/admin/report/<%- company._id %>">Monthly Report</a>
         </td>

@@ -14,6 +14,10 @@ tr:nth-child(even) {
   background-color: #dddddd;
 }
 
+table:last-child {
+  text-align: right;
+}
+
 table form {
   margin-block-end: 0 !important;
 }

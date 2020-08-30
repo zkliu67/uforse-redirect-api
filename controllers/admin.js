@@ -2,36 +2,25 @@ const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
 const PDFDocument = require('pdfkit');
+const { validationResult } = require('express-validator');
 
 const { sendError } = require('../helper/errorHelper');
 const { generateReport, getReportName } = require('../helper/reportHelper');
 const { sendMail } = require('../helper/emailHelper');
+const companyHelper = require('../helper/companyHelper');
+const visitHelper = require('../helper/visitHelper');
 
 const HttpStatus = require('http-status');
 
 const Company = require('../models/company');
+const Visit = require('../models/vist');
 
-exports.getCompany = async (req, res, next) => {
+exports.getCompanies = async (req, res, next) => {
   try {
-    const companies = await Company.find();
-    // count the total records of a company and monthly records
-    const recordsOfCompanies = companies.map(company => {
-      var record = company.records.filter(
-        record => record.enterAt.getMonth() === new Date().getMonth()
-      )
-      company.totalRecords = company.records.length;
-      company.monthlyRecords = record.length
-      return company;
-    });
-
-    // console.log(Object.keys(recordsOfCompanies[0]));
-
-    // res.status(200).json({
-    //   totalRecords: recordsOfCompanies
-    // })
+    const allVisits = await visitHelper.visitsAllCompanies();
     res.render('company-list', {
       pageTitle: 'Company-List',
-      companies: recordsOfCompanies,
+      allVisits: allVisits,
       moment: moment
     })
   } catch (err) {
@@ -39,41 +28,42 @@ exports.getCompany = async (req, res, next) => {
   }
 }
 
+exports.getCompany = async (req, res, next) => {
+  const companyId = req.params.companyId;
+  try {
+    const company = await Company.findById(companyId);
+    if (company == null) {
+      return sendError(res, HttpStatus.NOT_FOUND, null, 'Not found.');
+    }
+    const { dateArray, countArray } = companyHelper.getDailyRecords(company);
+
+    res.render('company', {
+      pageTitle: 'detail',
+      company: company,
+      dateArray: dateArray,
+      countArray: countArray
+    })
+
+  } catch(err) {
+    next(err)
+  }
+}
+
 exports.getCompaniesReport = async (req, res, next) => {
   try {
+    const dailyCompanyVisits = await visitHelper.CompaniesVisitsDaily();
     const companies = await Company.find();
-    
-    let totalRecord = 0;
-    companies.map(company => {
-      return totalRecord += company.records.length
-    });
-
-    let recordMap = new Map();
-    companies.map(company => {
-      const companyName = company.companyName;
-      
-      company.records.map(record => {
-        let month = record.enterAt.getMonth() + 1;
-        month = month < 10 ? '0'+month : month;
-        const year = record.enterAt.getFullYear();
-        const date = `${year}-${month}`.toString();
-
-        if (!recordMap.has(date)) {
-          const montlyReport = new Map([[companyName, 1]]);
-          recordMap.set(date, montlyReport);
-        } else {
-          const monthlyReport = recordMap.get(date);
-          if (!monthlyReport.has(companyName)) {
-            monthlyReport.set(companyName, 1);
-          } else {
-            monthlyReport.set(companyName, monthlyReport.get(companyName)+1);
-          }
-          recordMap.set(date, monthlyReport);
-        }
-      })
-    });
-
-    console.log(recordMap);
+    const visits = await Visit.find()
+    // res.status(200).json({
+    //   dailyCompanyVisits: dailyCompanyVisits,
+    //   companies: companies
+    // })
+    res.render('total-companies-records', {
+      pageTitle: 'Daily Visits',
+      companies: companies,
+      dailyCompanyVisits: dailyCompanyVisits,
+      totalVisits: visits
+    })
   } catch (err) {
     next(err);
   }
@@ -129,26 +119,40 @@ exports.getAddCompany = async (req, res, next) => {
 }
 
 exports.postAddCompany = async (req, res, next) => {
-  const { companyName, startAt } = req.body;
-  let endAt = req.body.endAt;
+  let { companyName, startAt, endAt, contactName, contactPhone, contactEmail } = req.body;
+
+  console.log(req.body);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return sendError(res, HttpStatus.BAD_REQUEST, errors, 'Bad request');
+  }
 
   // handle input error later
-  if (companyName === "" || startAt === "") {
+  if (companyName === "" || startAt === "" || contactName === "") {
     return res.status(422).render('add-company', {
       pageTitle: 'Add Company'
     })
   }
   
   endAt = endAt === "" ? null : new Date(endAt);
+  contactPhone = contactPhone == "" ? null : contactPhone
+  contactEmail = contactEmail == "" ? null : contactEmail
 
   const company = new Company({
     companyName: companyName,
+    contactName: contactName,
+    contactPhone: contactPhone,
+    contactEmail: contactEmail,
     startDate: new Date(startAt),
     endDate: endAt
   })
 
   try {
     await company.save();
+    const redirectLink = `/from/${company._id}`;
+    company.redirectLink = redirectLink
+    await company.save();
+
     res.redirect('/admin/all-companies');
   
   } catch (err) {
