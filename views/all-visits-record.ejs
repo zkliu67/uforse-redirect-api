@@ -1,0 +1,49 @@
+  <%- include('./includes/header.ejs') %>
+  <link rel="stylesheet" href="/css/companies.css">
+</head>
+
+<body>
+  <h1>Total Records</h1>
+  <table>
+    <tr>
+      <th>Date</th>
+      <% for (let company of companies) { %> 
+      <th><%= company.companyName %></th>
+      <% } %> 
+      <th>Total</th>
+    </tr>
+    <%- include('./includes/visit-table-row.ejs', { allVisits: allVisits }) %> 
+  </table>
+</body>
+
+<script>
+  $('span[name="display"]').click(function() {
+    const display = $(this).attr('display');
+    const monthDate = $(this).attr('data-id');
+
+    if (display === 'false') {
+      const params = {monthDate: monthDate};
+      const currRow = $(this).closest('tr')
+      const currRowId = currRow.attr('row-index');
+      console.log(currRowId);
+
+      $.get('/admin/all-visits', params, function(data) {
+        $(data).insertAfter(currRow)
+      })
+
+      $(this).attr('display', 'true');
+      $(this).text('show less');
+    }
+
+    else {
+      $('tr[class="daily__table__row"]').remove();
+      $(this).attr('display', 'false');
+      $(this).text('show more');
+    }
+    
+    
+
+    
+  })
+</script>
+<%- include('./includes/end.ejs') %> 

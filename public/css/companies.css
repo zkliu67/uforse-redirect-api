@@ -10,10 +10,6 @@ td, th {
   padding: 8px;
 }
 
-tr:nth-child(even) {
-  background-color: #dddddd;
-}
-
 table:last-child {
   text-align: right;
 }
@@ -28,4 +24,13 @@ table form {
   background-color: transparent;
   cursor: pointer;
   text-decoration: underline;
+}
+
+.table__row__month > span {
+  cursor: pointer;
+  color: blue;
+}
+
+.daily__table__row {
+  background-color: #cccccc;
 }

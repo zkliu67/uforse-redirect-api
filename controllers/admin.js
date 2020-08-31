@@ -15,14 +15,37 @@ const HttpStatus = require('http-status');
 const Company = require('../models/company');
 const Visit = require('../models/vist');
 
-exports.getCompanies = async (req, res, next) => {
+exports.getVisitsMonthly = async (req, res, next) => {
   try {
-    const allVisits = await visitHelper.visitsAllCompanies();
-    res.render('company-list', {
-      pageTitle: 'Company-List',
-      allVisits: allVisits,
-      moment: moment
-    })
+    const companies = await Company.find();
+
+    if (req.query.monthDate) {
+      const monthDate = req.query.monthDate.split('-');
+      // get daily visits with month data.
+      const result = await visitHelper.getDailyVisitsByMonth({
+        year: monthDate[0],
+        month: monthDate[1]
+      })
+      
+      res.render('includes/visit-table-row.ejs', {
+        companies: companies,
+        allVisits: result,
+        daily: true
+      });
+
+    } else {
+      const allVisits = await visitHelper.CompaniesVisitsMonthly();
+      res.render('all-visits-record', {
+        pageTitle: 'Montly Visits',
+        allVisits: allVisits,
+        companies: companies,
+        daily: false
+      })
+      // res.status(200).json({
+      //   monthlyVisits: allVisits
+      // })
+    }
+    
   } catch (err) {
     next(err);
   }

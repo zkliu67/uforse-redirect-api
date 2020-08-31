@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 const hpp = require('hpp');
 const httpStatus = require('http-status');
 const requestIp = require('request-ip');
+const $ = require('jquery');
+
 require('dotenv').config();
 
 const { sendError } = require('./helper/errorHelper');

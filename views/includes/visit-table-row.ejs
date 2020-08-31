@@ -1,0 +1,16 @@
+<% for (var index = 0; index < allVisits.length; index++) { %>
+<tr <% if (daily) { %> class="daily__table__row" <% } else { %> row-index=<%=index%> <% } %>>
+    <td class="table__row__month">
+      <%= allVisits[index].date %> 
+      <% if (!daily) { %> 
+        <span name="display" data-id=<%= allVisits[index].date %> display="false">show more</span>
+      <% } %> 
+    </td>
+    <% for (let company of companies) { %> 
+      <td>
+        <%= allVisits[index].dailyVisits[company.companyName] ? allVisits[index].dailyVisits[company.companyName] : 0 %> 
+      </td>
+    <% } %> 
+    <td><%= allVisits[index].dailyTotal %></td>
+  </tr>
+<% } %>
