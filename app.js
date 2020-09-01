@@ -2,6 +2,8 @@ const path = require('path');
 const express = require("express");
 const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
+const session = require('express-session');
+const mongodbStore = require('connect-mongodb-session')(session);
 const hpp = require('hpp');
 const httpStatus = require('http-status');
 const requestIp = require('request-ip');
@@ -11,17 +13,25 @@ require('dotenv').config();
 
 const { sendError } = require('./helper/errorHelper');
 
+const mongo_url = process.env.MONGODB_URI === "true" ? `mongodb+srv://admin:${process.env.DB_PASSWORD}@shop.wyugv.mongodb.net/${process.env.TB_NAME}?retryWrites=true&w=majority` : require('./config/keys').mongoURI;
+
 // setup routes
 const apiRoutes = require('./routes/index');
 const adminRoutes = require('./routes/admin');
+
 const app = express();
+const store = new mongodbStore({
+  uri: mongo_url,
+  collection: 'sessions'
+});
 
 /% Set the view engine used in the express server %/
 app.set('view engine', 'ejs'); // set global configuration value
 app.set('views', 'views'); // Tell the express find templates in './views' folder
 // load public folder files
 app.use(express.static(path.join(__dirname, 'public'))); // pass a folder for read only
-
+// express-session
+app.use(session({secret: 'my secret', resave: false, saveUninitialized: false, store: store}))
 // allows for form submission as json file
 app.use(bodyParser.urlencoded({extended: false}));
 
@@ -35,7 +45,6 @@ app.use(hpp());
 //   .catch(err => console.error.bind(console, `MongoDB connection error: ${JSON.stringify(err)}`));
 
 // Database Connection
-const mongo_url = process.env.MONGODB_URI === "true" ? `mongodb+srv://admin:${process.env.DB_PASSWORD}@shop.wyugv.mongodb.net/${process.env.TB_NAME}?retryWrites=true&w=majority` : require('./config/keys').mongoURI;
 mongoose
   .connect(mongo_url, {
     useNewUrlParser: true,

@@ -5,7 +5,6 @@ const HttpStatus = require('http-status');
 
 exports.jumpTo = async (req, res, next) => {
   const companyId = req.params.companyId;
-  // 5f3f4f599f3f48099f72f408
   try {
     const company = await Company.findById(companyId);
 
@@ -15,7 +14,7 @@ exports.jumpTo = async (req, res, next) => {
         visitAt: new Date()
       })
       await visit.save();
-      return res.redirect('/admin/all-companies')
+      return res.redirect('/admin/all-visits')
       // return res.redirect('https://www.uforse.com')
     }
     else {

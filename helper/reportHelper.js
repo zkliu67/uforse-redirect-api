@@ -1,7 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
-exports.generateReport = (pdfDoc, company) => {
+reportHelper = {};
+
+reportHelper.generateReport = (pdfDoc, company) => {
 
   generateHeader(pdfDoc);
   generateCompanyInfo(pdfDoc, company);
@@ -12,7 +14,7 @@ exports.generateReport = (pdfDoc, company) => {
   return pdfDoc;
 }
 
-exports.getReportName = (company) => {
+reportHelper.getReportName = (company) => {
   const date = new Date();
   let month = date.getMonth() + 1;
   month = month < 10 ? '0'+month : month;
@@ -66,4 +68,6 @@ function generateFooter(doc) {
       { align: "center", width: 500 }
     );
 }
+
+module.exports = reportHelper;
 

@@ -26,6 +26,26 @@ table form {
   text-decoration: underline;
 }
 
+.company__detail__th {
+  display: flex;
+  flex-direction: column;
+}
+
+.company__detail__th > p {
+  margin: 0 !important;
+  font-weight: normal;
+  font-size: small;
+}
+
+.company__detail__th > p:first-child {
+  font-weight: bold;
+  font-size: large;
+}
+
+.company__detail__th > p:not(:last-child) {
+  margin-bottom: 8px !important;
+}
+
 .table__row__month > span {
   cursor: pointer;
   color: blue;

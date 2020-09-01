@@ -1,23 +1,95 @@
 const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
+const brcypt = require('bcrypt');
 const PDFDocument = require('pdfkit');
 const { validationResult } = require('express-validator');
 
 const { sendError } = require('../helper/errorHelper');
-const { generateReport, getReportName } = require('../helper/reportHelper');
+const reportHelper = require('../helper/reportHelper');
+const otherHelper = require('../helper/otherHelper');
+
 const { sendMail } = require('../helper/emailHelper');
-const companyHelper = require('../helper/companyHelper');
 const visitHelper = require('../helper/visitHelper');
 
 const HttpStatus = require('http-status');
 
 const Company = require('../models/company');
 const Visit = require('../models/vist');
+const User = require('../models/user');
+
+exports.getLogin = async (req, res, next) => {
+  res.render('login', {
+    pageTitle: 'Login'
+  });
+}
+
+exports.postLogin = async (req, res, next) => {
+  const {username, password} = req.body;
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    // 422 indicates validation error
+    // instead of redirect
+    return sendError(res, HttpStatus.BAD_REQUEST, errors, 'Bad request');
+  }
+  try {
+    const user = User.findOne({username: username});
+    if (!user) { return res.redirect('/admin/login'); }
+
+    const doMatch = brcypt.compare(password, user.password);
+    if (doMatch) {
+      req.session.isLoggedIn = true;
+      // req.session.user = user;
+
+      return req.session.save(err => {
+        console.log(err);
+        res.redirect('/admin/all-visits' );
+      });
+    }
+
+    else {
+      return res.redirect('/admin/login');
+    }  
+  } catch (err) {
+    next(err);
+  }
+}
+
+exports.getRegister = (req, res, next) => {
+  res.render('register', {
+    pageTitle: 'Register'
+  })
+}
+
+exports.postRegister = async (req, res, next) => {
+  const {username, password, password2} = req.body;
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    // 422 indicates validation error
+    // instead of redirect
+    return sendError(res, HttpStatus.BAD_REQUEST, errors, 'Bad request');
+  }
+
+  try {
+    const hashedPassword = await brcypt.hash(password, 12)
+    const newUser = new User({
+      username: username,
+      password: hashedPassword
+    });
+
+    await newUser.save();
+    res.redirect('/admin/login');
+  } catch (err) {
+    next(err);
+  }
+}
 
 exports.getVisitsMonthly = async (req, res, next) => {
   try {
     const companies = await Company.find();
+    const visits = await Visit.find();
 
     if (req.query.monthDate) {
       const monthDate = req.query.monthDate.split('-');
@@ -37,8 +109,10 @@ exports.getVisitsMonthly = async (req, res, next) => {
       const allVisits = await visitHelper.CompaniesVisitsMonthly();
       res.render('all-visits-record', {
         pageTitle: 'Montly Visits',
+        visitsCount: visits.length,
         allVisits: allVisits,
         companies: companies,
+        moment: moment,
         daily: false
       })
       // res.status(200).json({
@@ -51,44 +125,26 @@ exports.getVisitsMonthly = async (req, res, next) => {
   }
 }
 
-exports.getCompany = async (req, res, next) => {
-  const companyId = req.params.companyId;
-  try {
-    const company = await Company.findById(companyId);
-    if (company == null) {
-      return sendError(res, HttpStatus.NOT_FOUND, null, 'Not found.');
-    }
-    const { dateArray, countArray } = companyHelper.getDailyRecords(company);
-
-    res.render('company', {
-      pageTitle: 'detail',
-      company: company,
-      dateArray: dateArray,
-      countArray: countArray
-    })
-
-  } catch(err) {
-    next(err)
-  }
-}
-
 exports.getCompaniesReport = async (req, res, next) => {
-  try {
-    const dailyCompanyVisits = await visitHelper.CompaniesVisitsDaily();
-    const companies = await Company.find();
-    const visits = await Visit.find()
-    // res.status(200).json({
-    //   dailyCompanyVisits: dailyCompanyVisits,
-    //   companies: companies
-    // })
-    res.render('total-companies-records', {
-      pageTitle: 'Daily Visits',
-      companies: companies,
-      dailyCompanyVisits: dailyCompanyVisits,
-      totalVisits: visits
-    })
-  } catch (err) {
-    next(err);
+  
+  if (req.query.month) {
+    const yearMonth = req.query.month.split('-');
+    const companies = Company.find();
+
+    const result = await visitHelper.getDailyVisitsByMonth({
+      year: yearMonth[0],
+      month: yearMonth[1]
+    });
+
+    // for testing
+    // const apiGet = await otherHelper.generateQRCode();
+    // console.log(apiGet);
+    res.status(200).json({'result': result});
+
+  } else {
+    const error = new Error('Invalid Endpoint');
+    error.httpStatusCode = 404;
+    return next(error);
   }
 }
 

@@ -3,12 +3,22 @@
 </head>
 
 <body>
-  <h1>Total Records</h1>
+  <h3>Total Visits: <%= visitsCount %></h3>
   <table>
     <tr>
       <th>Date</th>
       <% for (let company of companies) { %> 
-      <th><%= company.companyName %></th>
+      <th>
+        <div class="company__detail__th">
+          <p class="company__detail__name"><%= company.companyName %></p>
+          <p>Valid from: <%= moment(company.startDate).format('YYYY-MM-DD') %> 
+            <% if (company.endDate) { %> to <%= moment(company.endDate).format('YYYY-MM-DD') %></p> <% } %>   
+          <p>Contact Info: <%= company.contactName %></p>
+          <p>Phone: <%= company.contactPhone %></p>
+          <p>Email: <%= company.contactEmail %></p>
+          <p>Link: <%= company.redirectLink %></p>
+        </div>
+      </th>
       <% } %> 
       <th>Total</th>
     </tr>

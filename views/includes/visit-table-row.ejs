@@ -4,6 +4,8 @@
       <%= allVisits[index].date %> 
       <% if (!daily) { %> 
         <span name="display" data-id=<%= allVisits[index].date %> display="false">show more</span>
+        |
+        <a href="/admin/report?month=<%= allVisits[index].date %>">report</a>
       <% } %> 
     </td>
     <% for (let company of companies) { %> 

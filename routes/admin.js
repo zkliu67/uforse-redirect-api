@@ -2,15 +2,15 @@ const express = require('express');
 const { body } = require('express-validator');
 
 const adminController = require('../controllers/admin');
+const isAuth = require('../middleware/is-auth');
 
 const router = express.Router();
 
-router.get('/all-visits', adminController.getVisitsMonthly);
-
-router.get('/company/:companyId', adminController.getCompany);
-router.get('/add-company', adminController.getAddCompany);
-router.get('/report/:companyId', adminController.getCompanyReport);
-router.get('/report', adminController.getCompaniesReport);
+router.get('/login', adminController.getLogin);
+router.get('/register', adminController.getRegister);
+router.get('/all-visits', isAuth, adminController.getVisitsMonthly);
+router.get('/add-company', isAuth, adminController.getAddCompany);
+router.get('/report', isAuth, adminController.getCompaniesReport);
 
 router.post('/add-company',[
   body('companyName')
@@ -27,7 +27,10 @@ router.post('/add-company',[
     .optional({checkFalsy: true})
     .isNumeric()
     .withMessage('Please input a valid phone number')
-], adminController.postAddCompany);
-router.post('/email/:companyId', adminController.postEmailReport);
+], isAuth, adminController.postAddCompany);
+
+router.post('/login', adminController.postLogin);
+router.post('/register', adminController.postRegister);
+router.post('/email/:companyId', isAuth, adminController.postEmailReport);
 
 module.exports = router;
