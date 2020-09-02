@@ -6,7 +6,7 @@ const Company = require('../models/company');
 
 const otherHelper = {};
 
-otherHelper.checkCompanyValidation = schedule.scheduleJob('*/5 * * * * *', function() {
+otherHelper.checkCompanyValidation = schedule.scheduleJob({hour: 00, minute: 00}, function() {
   const date = moment(new Date()).format('YYYY-MM-DD');
 
   Company.find()
@@ -14,7 +14,7 @@ otherHelper.checkCompanyValidation = schedule.scheduleJob('*/5 * * * * *', funct
       companies.forEach(company => {
         if (company.endDate) {
           const endDate = moment(company.endDate).format('YYYY-MM-DD');
-          if (date >= endDate) {
+          if (date > endDate) {
             console.log('large')
             company.isValid = false;
             return company.save()
@@ -27,10 +27,13 @@ otherHelper.checkCompanyValidation = schedule.scheduleJob('*/5 * * * * *', funct
     .catch(err => {throw(err)})
 });
 
-otherHelper.generateQRCode = async () => {
+otherHelper.generateQRCode = async (companyId) => {
   try {
-    return await axios.get('https://cli.im/api/qrcode/code?text=//cli.im&mhid=sELPDFnok80gPHovKdI')
-
+    const response = await axios({
+      "method":"POST", 
+      "url":`https://cli.im/api/qrcode/code?text=http%3A%2F%2Fuforse-redirect-api.herokuapp.com%2Ffrom%${companyId}&mhid=sELPDFnok80gPHovKdI`
+    })
+    return response.data;
   } catch (err) {
     throw (err);
   }

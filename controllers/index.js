@@ -14,8 +14,8 @@ exports.jumpTo = async (req, res, next) => {
         visitAt: new Date()
       })
       await visit.save();
-      return res.redirect('/admin/all-visits')
-      // return res.redirect('https://www.uforse.com')
+      // return res.redirect('/admin/all-visits')
+      return res.redirect('https://www.uforse.com')
     }
     else {
       sendError(res, HttpStatus.UNAUTHORIZED, null, 'Invalid company');

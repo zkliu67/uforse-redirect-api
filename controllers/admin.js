@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
-const brcypt = require('bcrypt');
+const brcypt = require('bcryptjs');
 const PDFDocument = require('pdfkit');
 const { validationResult } = require('express-validator');
 
@@ -34,16 +34,15 @@ exports.postLogin = async (req, res, next) => {
     return sendError(res, HttpStatus.BAD_REQUEST, errors, 'Bad request');
   }
   try {
-    const user = User.findOne({username: username});
+    const user = await User.findOne({username: username});
     if (!user) { return res.redirect('/admin/login'); }
 
-    const doMatch = brcypt.compare(password, user.password);
+    const doMatch = await brcypt.compare(password, user.password);
     if (doMatch) {
       req.session.isLoggedIn = true;
       // req.session.user = user;
 
       return req.session.save(err => {
-        console.log(err);
         res.redirect('/admin/all-visits' );
       });
     }
@@ -126,20 +125,30 @@ exports.getVisitsMonthly = async (req, res, next) => {
 }
 
 exports.getCompaniesReport = async (req, res, next) => {
-  
+  // get monthly report
   if (req.query.month) {
     const yearMonth = req.query.month.split('-');
-    const companies = Company.find();
+    const companies = await Company.find().lean();
+    const companyNames = companies.map(company => company.companyName);
 
-    const result = await visitHelper.getDailyVisitsByMonth({
+    const dailyVisits = await visitHelper.getDailyVisitsByMonth({
       year: yearMonth[0],
       month: yearMonth[1]
     });
 
-    // for testing
-    // const apiGet = await otherHelper.generateQRCode();
-    // console.log(apiGet);
-    res.status(200).json({'result': result});
+    const reportName = `${req.query.month}-daily-visits.pdf`;
+    const reportPath = path.join('data', 'reports', reportName);
+
+    const pdfReport = reportHelper.generateReport(new PDFDocument(), companyNames, dailyVisits);
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      'inline; filename="' + reportName + '"'
+    );
+
+    pdfReport.pipe(fs.createWriteStream(reportPath));
+    pdfReport.pipe(res);
 
   } else {
     const error = new Error('Invalid Endpoint');
@@ -232,7 +241,7 @@ exports.postAddCompany = async (req, res, next) => {
     company.redirectLink = redirectLink
     await company.save();
 
-    res.redirect('/admin/all-companies');
+    res.redirect(`/admin/generate-qr-code/${company._id}`);
   
   } catch (err) {
     console.log(err);
@@ -240,7 +249,19 @@ exports.postAddCompany = async (req, res, next) => {
   
 }
 
-exports.postEmailReport = (req, res, next) => {
-  sendMail("Nodemailer test", "succeed");
-  res.redirect('/admin/all-companies');
+exports.getCompanyQR = async (req, res, next) => {
+  
+  try {
+    const companyId = req.params.companyId;
+    const company = await Company.findById(companyId);
+    if (!company) { sendError(res, HttpStatus.NOT_FOUND, 'URL Not Found!', ''); }
+    
+    const qrHTML = await otherHelper.generateQRCode(company._id);
+    res.send(qrHTML);
+
+  } catch (err) {
+    next(err);
+  }
+  
 }
+

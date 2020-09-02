@@ -3,26 +3,15 @@ const path = require('path');
 
 reportHelper = {};
 
-reportHelper.generateReport = (pdfDoc, company) => {
+reportHelper.generateReport = (pdfDoc, companies, dailyVisits) => {
 
   generateHeader(pdfDoc);
-  generateCompanyInfo(pdfDoc, company);
-  generateReportTable(pdfDoc, company.monthlyReport);
+  generateTableHeader(pdfDoc, companies)
+  generateReportTable(pdfDoc, companies, dailyVisits);
   generateFooter(pdfDoc);
   
   pdfDoc.end();
   return pdfDoc;
-}
-
-reportHelper.getReportName = (company) => {
-  const date = new Date();
-  let month = date.getMonth() + 1;
-  month = month < 10 ? '0'+month : month;
-  const year = date.getFullYear();
-
-  return 'Report-' + 
-  company.companyName + '-'+ 
-  month + '-' + year + '.pdf';
 }
 
 function generateCompanyInfo(doc, company) {
@@ -38,31 +27,70 @@ function generateHeader(doc) {
   doc
     .fillColor("#444444")
     .fontSize(20)
-    .text("Uforse Inc.", 50, 57)
+    .text("Uforse Education Inc.", 50, 57)
     .fontSize(10)
-    .text("123 Main Street", 200, 65, { align: "right" })
-    .text("Toronto, On, CA", 200, 80, { align: "right" })
+    // .text("123 Main Street", 200, 65, { align: "right" })
+    // .text("Toronto, On, CA", 200, 80, { align: "right" })
 }
 
-function generateReportTable(doc, monthlyReport) {
-  let i = 0,
-    reportTableTop = 165;
+function generateTableHeader(doc, companies) {
+  const cellWidth = (doc.page.width / (companies.length + 2)) >> 0;
+  const widthProp = { width: cellWidth, align: "left" };
+  let marginStart = 50;
+
+  doc
+    .fontSize(12)
+    .text("Date", marginStart, 90, widthProp)
   
-  monthlyReport.forEach((value, key) => {
-    const recordTop = reportTableTop + 15*i;
-    i++;
+    companies.forEach(company => {
+    marginStart += cellWidth;
     doc
-      .text(key, 50, recordTop)
-      .text(value, 150, recordTop)
-      .moveDown()
-  })
+      .text(company, marginStart, 90, widthProp)
+      .stroke()
+  });
+  
+  marginStart += cellWidth;
+  doc.text("total", marginStart, 90, widthProp)
+}
+
+function generateTableRow(doc, height, dailyVisit, companies) {
+  const cellWidth = (doc.page.width / (companies.length + 2)) >> 0;
+  const widthProp = { width: cellWidth, align: "left" };
+  let marginStart = 50;
+
+  doc
+    .fontSize(10)
+    .text(dailyVisit.date, marginStart, height, widthProp)
+
+  companies.forEach(company => {
+      count = dailyVisit.dailyVisits[company] ? dailyVisit.dailyVisits[company] : 0
+      marginStart += cellWidth
+      doc.text(count, marginStart, height, widthProp)
+    })
+  doc
+    .text(dailyVisit.dailyTotal, marginStart + cellWidth, height, widthProp)
+
+}
+
+function generateReportTable(doc, companies, dailyVisits) {
+  let totalVisits = 0,
+    reportTableTop = 120;
+  dailyVisits.forEach((dailyVisit, index) => {
+    generateTableRow(doc, reportTableTop, dailyVisit, companies);
+    reportTableTop += 30;
+    totalVisits += dailyVisit.dailyTotal;
+  })  
+
+  doc
+    .fontSize(13)
+    .text(`Total: ${totalVisits}`,50 ,reportTableTop, {align: "left"})
 }
 
 function generateFooter(doc) {
   doc
-    .fontSize(10)
+    .fontSize(8)
     .text(
-      "Payment is due within 15 days. Thank you for your business.",
+      "UFORSE EDUCATION INC 2020.",
       50,
       700,
       { align: "center", width: 500 }

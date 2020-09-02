@@ -42,13 +42,13 @@
       })
 
       $(this).attr('display', 'true');
-      $(this).text('show less');
+      $(this).children().replaceWith('<i class="fas fa-chevron-circle-up"></i>');
     }
 
     else {
       $('tr[class="daily__table__row"]').remove();
       $(this).attr('display', 'false');
-      $(this).text('show more');
+      $(this).children().replaceWith('<i class="fas fa-chevron-circle-down"></i>');
     }
     
     
