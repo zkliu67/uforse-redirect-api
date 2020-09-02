@@ -5,8 +5,16 @@ const port = process.env.PORT || 8080;
 const env = process.env.ENV || 'Development';
 const app_name = process.env.APP_NAME || 'Uforse-redirect-api';
 const server = http.createServer(app);
+const schedule = require('node-schedule');
+
+const otherHelper = require('./helper/otherHelper');
 
 app.set('PORT_NUMBER', port);
+
+// schedule.scheduleJob('*/1 * * * * *', function() {
+//   console.log("running a task every minute");
+// });
+// autoHelper.autoTester;
 
 // Start the app on the specific interface (and port)
 server.listen(port, () => {

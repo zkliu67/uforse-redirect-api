@@ -1,0 +1,16 @@
+<%- include('./includes/header.ejs') %> 
+<body>
+  <form method="POST" action="/admin/login">
+    <div>
+      <label>Username</label>
+      <input type="text" name="username" id="username" >
+    </div>
+    <div>
+      <label>Password</label>
+      <input type="password" name="password" id="password" >
+    </div>
+    <button type="submit">Login</button>
+  </form>
+</body>
+
+<%- include('./includes/end.ejs') %>

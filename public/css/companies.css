@@ -1,0 +1,56 @@
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #eeeeee;
+  text-align: left;
+  padding: 8px;
+}
+
+table:last-child {
+  text-align: right;
+}
+
+table form {
+  margin-block-end: 0 !important;
+}
+
+.report-button {
+  border: none;
+  color: blue;
+  background-color: transparent;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.company__detail__th {
+  display: flex;
+  flex-direction: column;
+}
+
+.company__detail__th > p {
+  margin: 0 !important;
+  font-weight: normal;
+  font-size: small;
+}
+
+.company__detail__th > p:first-child {
+  font-weight: bold;
+  font-size: large;
+}
+
+.company__detail__th > p:not(:last-child) {
+  margin-bottom: 8px !important;
+}
+
+.table__row__month > span {
+  cursor: pointer;
+  color: blue;
+}
+
+.daily__table__row {
+  background-color: #cccccc;
+}

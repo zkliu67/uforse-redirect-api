@@ -1,19 +1,39 @@
+const path = require('path');
 const express = require("express");
 const bodyParser = require('body-parser');
 const mongoose = require("mongoose");
+const session = require('express-session');
+const mongodbStore = require('connect-mongodb-session')(session);
 const hpp = require('hpp');
+const httpStatus = require('http-status');
 const requestIp = require('request-ip');
+const $ = require('jquery');
+
 require('dotenv').config();
+
+const { sendError } = require('./helper/errorHelper');
+const keys = require('./config/keys');
+
+const mongo_url = process.env.MONGODB_URI === "true" ? `mongodb+srv://admin:${process.env.DB_PASSWORD}@shop.wyugv.mongodb.net/${process.env.TB_NAME}?retryWrites=true&w=majority` : keys.mongoURI;
 
 // setup routes
 const apiRoutes = require('./routes/index');
 const adminRoutes = require('./routes/admin');
+
 const app = express();
+const store = new mongodbStore({
+  uri: mongo_url,
+  collection: 'sessions'
+});
 
 /% Set the view engine used in the express server %/
 app.set('view engine', 'ejs'); // set global configuration value
 app.set('views', 'views'); // Tell the express find templates in './views' folder
-
+// load public folder files
+app.use(express.static(path.join(__dirname, 'public'))); // pass a folder for read only
+// express-session
+const sessionKey = process.env.SESSION_KEY || keys.sessionSk;
+app.use(session({secret: sessionKey, resave: false, saveUninitialized: false, store: store}))
 // allows for form submission as json file
 app.use(bodyParser.urlencoded({extended: false}));
 
@@ -27,7 +47,6 @@ app.use(hpp());
 //   .catch(err => console.error.bind(console, `MongoDB connection error: ${JSON.stringify(err)}`));
 
 // Database Connection
-const mongo_url = process.env.MONGODB_URI ? process.env.MONGODB_URI : require('./config/keys').mongoURI;
 mongoose
   .connect(mongo_url, {
     useNewUrlParser: true,
@@ -55,23 +74,22 @@ app.use('/from', apiRoutes);
 app.use('/admin', adminRoutes);
 
 // catch 404 and forward to error handler
-// app.use((req, res, next) => {
-//   const err = new Error('Not Found');
-//   err.status = 404;
-//   next(err);
-// });
+app.use((req, res, next) => {
+  const err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
 
 // error handler
 // no stacktraces leaked to user unless in development environment
-// app.use((err, req, res, next) => {
-//   if (err.status === 404) {
-//     return otherHelper.sendResponse(res, httpStatus.NOT_FOUND, false, null, err, 'Route Not Found', null);
-//   } else {
-//     console.log('\x1b[41m', err);
-//     AddErrorToLogs(req, res, next, err);
-//     return otherHelper.sendResponse(res, httpStatus.INTERNAL_SERVER_ERROR, false, null, err, null, null);
-//   }
-// });
+app.use((err, req, res, next) => {
+  if (err.status === 404) {
+    return sendError(res, httpStatus.NOT_FOUND, err, 'Route Not Found');
+  } else {
+    console.log(err);
+    return sendError(res, httpStatus.INTERNAL_SERVER_ERROR, err, null);
+  }
+});
 
 module.exports = app;
 

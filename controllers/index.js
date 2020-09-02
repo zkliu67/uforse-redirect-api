@@ -1,37 +1,28 @@
 const Company = require('../models/company');
+const Visit = require('../models/vist');
+const { sendError } = require('../helper/errorHelper');
+const HttpStatus = require('http-status');
 
 exports.jumpTo = async (req, res, next) => {
   const companyId = req.params.companyId;
-  // 5f3f4f599f3f48099f72f408
   try {
     const company = await Company.findById(companyId);
 
     if (company != null && company.isValid) {
-      // return res.status(200).json({
-      //   company: company
-      // })
-      const record = {
-        isSucceed: true,
-        enterAt: new Date()
-      };
-
-      company.records.push(record);
-      await company.save();
-      // return res.redirect('/admin/all-companies')
+      const visit = new Visit({
+        companyId: company,
+        visitAt: new Date()
+      })
+      await visit.save();
+      // return res.redirect('/admin/all-visits')
       return res.redirect('https://www.uforse.com')
     }
-
     else {
-      return res.status(404).json({
-        message: "invalid company."
-      });
+      sendError(res, HttpStatus.UNAUTHORIZED, null, 'Invalid company');
     }
 
   } catch (err) {
-    // invalid object id
-    return res.status(500).json({
-      message: err 
-    })
+    next(err);
   }
 
 }
