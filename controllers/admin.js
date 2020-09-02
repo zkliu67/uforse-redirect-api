@@ -19,6 +19,7 @@ const Visit = require('../models/vist');
 const User = require('../models/user');
 
 exports.getLogin = async (req, res, next) => {
+  
   res.render('login', {
     pageTitle: 'Login'
   });
@@ -33,6 +34,7 @@ exports.postLogin = async (req, res, next) => {
     // instead of redirect
     return sendError(res, HttpStatus.BAD_REQUEST, errors, 'Bad request');
   }
+
   try {
     const user = await User.findOne({username: username});
     if (!user) { return res.redirect('/admin/login'); }
@@ -42,9 +44,8 @@ exports.postLogin = async (req, res, next) => {
       req.session.isLoggedIn = true;
       // req.session.user = user;
 
-      return req.session.save(err => {
-        res.redirect('/admin/all-visits' );
-      });
+      await req.session.save()
+      res.redirect('/admin/all-visits' );
     }
 
     else {
