@@ -11,7 +11,7 @@ const $ = require('jquery');
 require('dotenv').config();
 const { sendError } = require('./helper/errorHelper');
 
-const mongo_url = process.env.MONGODB_URI === "true" ? `mongodb+srv://admin:${process.env.DB_PASSWORD}@shop.wyugv.mongodb.net/${process.env.TB_NAME}?retryWrites=true&w=majority` : require('./config/keys').mongoURI;
+const mongo_url = process.env.DEPLOYED === "true" ? `mongodb+srv://admin:${process.env.DB_PASSWORD}@shop.wyugv.mongodb.net/${process.env.TB_NAME}?retryWrites=true&w=majority` : require('./config/keys').mongoURI;
 
 // setup routes
 const apiRoutes = require('./routes/index');
@@ -29,7 +29,7 @@ app.set('views', 'views'); // Tell the express find templates in './views' folde
 // load public folder files
 app.use(express.static(path.join(__dirname, 'public'))); // pass a folder for read only
 // express-session
-const sessionKey = process.env.SESSION_KEY ? process.env.SESSION_KEY : require('./config/keys').sessionSk;
+const sessionKey = process.env.DEPLOYED === "true" ? process.env.SESSION_KEY : require('./config/keys').sessionSk;
 app.use(session({secret: sessionKey, resave: false, saveUninitialized: false, store: store}))
 // allows for form submission as json file
 app.use(bodyParser.urlencoded({extended: false}));
