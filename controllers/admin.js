@@ -40,11 +40,13 @@ exports.postLogin = async (req, res, next) => {
     if (!user) { return res.redirect('/admin/login'); }
 
     const doMatch = await brcypt.compare(password, user.password);
+    console.log(doMatch);
     if (doMatch) {
       req.session.isLoggedIn = true;
       // req.session.user = user;
 
       await req.session.save()
+      console.log(req.session);
       res.redirect('/admin/all-visits' );
     }
 
