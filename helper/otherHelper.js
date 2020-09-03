@@ -29,9 +29,12 @@ otherHelper.checkCompanyValidation = schedule.scheduleJob({hour: 00, minute: 00}
 
 otherHelper.generateQRCode = async (companyId) => {
   try {
+    // console.log(companyId);
+    const url = process.env.QR_CODE_API || `https://cli.im/api/qrcode/code?text=https%3A%2F%2Fuforse-redirect-api.herokuapp.com%2Ffrom%2F${companyId}&mhid=sELPDFnok80gPHovKdI`;
+    // console.log(url);
     const response = await axios({
       "method":"POST", 
-      "url":`https://cli.im/api/qrcode/code?text=http%3A%2F%2Fuforse-redirect-api.herokuapp.com%2Ffrom%${companyId}&mhid=sELPDFnok80gPHovKdI`
+      "url":`https://cli.im/api/qrcode/code?text=${url}${companyId}&mhid=sELPDFnok80gPHovKdI`
     })
     return response.data;
   } catch (err) {
