@@ -1,6 +1,29 @@
-html {
+* {
+  box-sizing: border-box;
+}
+
+.container {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 1500px;
 }
+
+.header {
+  display: flex;
+  align-items: center;
+}
+
+.header > h3 {
+  margin-right: 30px;
+}
+
+.header > a {
+  border: 1px solid rosybrown;
+  border-radius: 5px;
+  background-color: royalblue;
+  color: white;
+  font-weight: bold;
+  padding: 10px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
