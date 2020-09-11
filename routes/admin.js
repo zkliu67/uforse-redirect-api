@@ -32,5 +32,6 @@ router.post('/add-company',[
 
 router.post('/login', adminController.postLogin);
 router.post('/register', adminController.postRegister);
+router.post('/upload-qr', isAuth, adminController.postUploadQR);
 
 module.exports = router;

@@ -30,6 +30,9 @@ const companySchema = new Schema({
   redirectLink: {
     type: String
   },
+  qrImg: {
+    type: String
+  },
   isValid: {
     type: Boolean, 
     required: true,

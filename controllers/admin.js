@@ -251,7 +251,6 @@ exports.postAddCompany = async (req, res, next) => {
 }
 
 exports.getCompanyQR = async (req, res, next) => {
-  
   try {
     const companyId = req.params.companyId;
     const company = await Company.findById(companyId);
@@ -259,6 +258,25 @@ exports.getCompanyQR = async (req, res, next) => {
     
     const qrHTML = await otherHelper.generateQRCode(company._id);
     res.send(qrHTML);
+
+  } catch (err) {
+    next(err);
+  } 
+}
+
+exports.postUploadQR = async (req, res, next) => {
+  const { companyId } = req.body;
+  const image = req.file;
+  if (!image) { 
+    return sendError(res, HttpStatus.BAD_REQUEST, 'Please upload Images', '') 
+  }
+
+  try {
+    const company = await Company.findById(companyId.trim());
+    const imageUrl = image.path;
+    company.qrImg = imageUrl;
+    await company.save();
+    res.redirect('/admin/all-visits');
 
   } catch (err) {
     next(err);

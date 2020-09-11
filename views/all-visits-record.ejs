@@ -21,7 +21,24 @@
             <p>Contact Info: <%= company.contactName %></p>
             <p>Phone: <%= company.contactPhone %></p>
             <p>Email: <%= company.contactEmail %></p>
-            <p>Link: <%= company.redirectLink %></p>
+            <!--<p>Link: <%= company.redirectLink %></p>-->
+            <div class="company__detail__img">
+              <% if (company.qrImg) { %>
+                <img src="/<%= company.qrImg %>" alt="qr-img" >
+              <% } else { %> 
+                <p>QR Code</p>
+              <% } %>   
+            </div>
+            
+            <form class="company__form" method="POST" action="/admin/upload-qr?company=<%= company.id %>" enctype="multipart/form-data">
+              <input type="file" name="image">  
+              <input type="hidden" name="companyId" value="<%= company.id %>">
+              <div class="company__form__actions">
+                <input type="submit" name="button" value="upload">
+                <a href="/admin/generate-qr-code/<%= company.id %>">Generate</a>  
+              </div>
+              
+            </form>
           </div>
         </th>
         <% } %> 
@@ -55,10 +72,6 @@
       $(this).attr('display', 'false');
       $(this).children().replaceWith('<i class="fas fa-chevron-circle-down"></i>');
     }
-    
-    
-
-    
   })
 </script>
 <%- include('./includes/end.ejs') %> 
