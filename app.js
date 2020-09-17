@@ -95,6 +95,8 @@ app.use(function(req, res, next) {
 // setup routing
 app.use('/from', apiRoutes);
 app.use('/admin', adminRoutes);
+app.use('/', (req, res, next) => {res.redirect('/admin/all-visits');})
+
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

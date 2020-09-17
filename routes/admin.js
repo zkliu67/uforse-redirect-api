@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.get('/login', adminController.getLogin);
 router.get('/register', adminController.getRegister);
+router.get('/logout', adminController.getLogout);
 router.get('/all-visits', isAuth, adminController.getVisitsMonthly);
 router.get('/add-company', isAuth, adminController.getAddCompany);
 router.get('/report', isAuth, adminController.getCompaniesReport);

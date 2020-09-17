@@ -86,10 +86,17 @@ exports.postRegister = async (req, res, next) => {
   }
 }
 
+exports.getLogout = (req, res, next) => {
+  req.session.isLoggedIn = false;
+  res.redirect('/admin/login');
+}
+
 exports.getVisitsMonthly = async (req, res, next) => {
   try {
     const companies = await Company.find();
     const visits = await Visit.find();
+
+    console.log(req.session);
 
     if (req.query.monthDate) {
       const monthDate = req.query.monthDate.split('-');
@@ -109,6 +116,7 @@ exports.getVisitsMonthly = async (req, res, next) => {
       const allVisits = await visitHelper.CompaniesVisitsMonthly();
       res.render('all-visits-record', {
         pageTitle: 'Montly Visits',
+        isLoggedIn: req.session.isLoggedIn,
         visitsCount: visits.length,
         allVisits: allVisits,
         companies: companies,

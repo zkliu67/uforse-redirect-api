@@ -2,11 +2,17 @@
   box-sizing: border-box;
 }
 
+body {
+  margin: 0;
+}
+
 .container {
   width: 100vw;
   max-width: 1280px;
   display: flex;
   flex-direction: column;
+  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .header {
