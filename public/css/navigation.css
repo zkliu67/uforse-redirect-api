@@ -1,0 +1,19 @@
+.navigation {
+  width: 100%;
+  background-color: #C9B1BD;
+  list-style-type: none;
+  overflow: hidden;
+}
+
+.navigation li {
+  float: right;
+  font-family: 'Open Sans', sans-serif;
+  margin-right: 50px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.navigation li a {
+  text-decoration: none;
+  color: white;
+}

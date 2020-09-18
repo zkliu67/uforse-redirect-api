@@ -1,0 +1,9 @@
+<ul class="navigation">
+<% if (isLoggedIn) { %> 
+  <li><a href="/admin/logout">Logout</a></li>
+  <li>|</li>
+  <li>Hi</li>
+<% } else { %>
+  <li><a href="/admin/login">Login</a></li>
+<% } %> 
+</ul>

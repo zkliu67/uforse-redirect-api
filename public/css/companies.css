@@ -31,19 +31,69 @@ table form {
   flex-direction: column;
 }
 
+.company__detail__name {
+  font-weight: bold;
+  font-size: large;
+}
+
 .company__detail__th > p {
   margin: 0 !important;
   font-weight: normal;
   font-size: small;
 }
 
-.company__detail__th > p:first-child {
-  font-weight: bold;
-  font-size: large;
-}
-
 .company__detail__th > p:not(:last-child) {
   margin-bottom: 8px !important;
+}
+
+.company__detail__img {
+  text-align: center;
+}
+
+.company__detail__img > img {
+  height: 60%;
+  width: auto;
+}
+
+.company__form {
+  display: flex;
+  text-align: center;
+}
+
+.company__form > input[type="file"] {
+  flex: 0.4;
+}
+
+.company__form > button {
+  border: none;
+  cursor: pointer;
+  background: transparent;
+}
+
+.company__form > button > .fas .fa-upload {
+  padding: 3px;
+}
+
+.company__image__action {
+  text-align: center;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+.company__image__action > .fas {
+  margin: 3px;
+}
+
+.company__form__actions > a {
+  border: none;
+  border-radius: 5px;
+  background-color: antiquewhite;
+  cursor: pointer;
+  padding: 6px;
+  color: cornflowerblue;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 13.3333px;
 }
 
 .table__row__month > span {
@@ -54,3 +104,8 @@ table form {
 .daily__table__row {
   background-color: #cccccc;
 }
+
+.display__none {
+  display: none;
+}
+

@@ -86,10 +86,17 @@ exports.postRegister = async (req, res, next) => {
   }
 }
 
+exports.getLogout = (req, res, next) => {
+  req.session.isLoggedIn = false;
+  res.redirect('/admin/login');
+}
+
 exports.getVisitsMonthly = async (req, res, next) => {
   try {
     const companies = await Company.find();
     const visits = await Visit.find();
+
+    console.log(req.session);
 
     if (req.query.monthDate) {
       const monthDate = req.query.monthDate.split('-');
@@ -109,6 +116,7 @@ exports.getVisitsMonthly = async (req, res, next) => {
       const allVisits = await visitHelper.CompaniesVisitsMonthly();
       res.render('all-visits-record', {
         pageTitle: 'Montly Visits',
+        isLoggedIn: req.session.isLoggedIn,
         visitsCount: visits.length,
         allVisits: allVisits,
         companies: companies,
@@ -251,7 +259,6 @@ exports.postAddCompany = async (req, res, next) => {
 }
 
 exports.getCompanyQR = async (req, res, next) => {
-  
   try {
     const companyId = req.params.companyId;
     const company = await Company.findById(companyId);
@@ -259,6 +266,25 @@ exports.getCompanyQR = async (req, res, next) => {
     
     const qrHTML = await otherHelper.generateQRCode(company._id);
     res.send(qrHTML);
+
+  } catch (err) {
+    next(err);
+  } 
+}
+
+exports.postUploadQR = async (req, res, next) => {
+  const { companyId } = req.body;
+  const image = req.file;
+  if (!image) { 
+    return sendError(res, HttpStatus.BAD_REQUEST, 'Please upload Images', '') 
+  }
+
+  try {
+    const company = await Company.findById(companyId.trim());
+    const imageUrl = image.path;
+    company.qrImg = imageUrl;
+    await company.save();
+    res.redirect('/admin/all-visits');
 
   } catch (err) {
     next(err);

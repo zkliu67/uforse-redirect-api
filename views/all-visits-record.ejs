@@ -3,6 +3,7 @@
 </head>
 
 <body>
+  <%- include('./includes/navigation.ejs') %>
   <div class="container">
     <div class="header">
       <h3>Total Visits: <%= visitsCount %></h3>
@@ -14,15 +15,35 @@
         <th>Date</th>
         <% for (let company of companies) { %> 
         <th>
-          <div class="company__detail__th">
-            <p class="company__detail__name"><%= company.companyName %></p>
-            <p>Valid from: <%= moment(company.startDate).format('YYYY-MM-DD') %> 
-              <% if (company.endDate) { %> to <%= moment(company.endDate).format('YYYY-MM-DD') %></p> <% } %>   
-            <p>Contact Info: <%= company.contactName %></p>
-            <p>Phone: <%= company.contactPhone %></p>
-            <p>Email: <%= company.contactEmail %></p>
-            <p>Link: <%= company.redirectLink %></p>
+          <p class="company__detail__name" dataid="<%= company.id %>"><%= company.companyName %></p>
+          <div id="popOver__<%= company.id %>" class="display__none">
+            <div class="company__detail__th">
+              <p>Valid from: <%= moment(company.startDate).format('YYYY-MM-DD') %> 
+                <% if (company.endDate) { %> to <%= moment(company.endDate).format('YYYY-MM-DD') %></p> <% } %>   
+              <p>Contact Info: <%= company.contactName %></p>
+              <p>Phone: <%= company.contactPhone %></p>
+              <p>Email: <%= company.contactEmail %></p>
+              <!--<p>Link: <%= company.redirectLink %></p>-->
+              <div class="company__detail__img">
+                <% if (company.qrImg) { %>
+                  <img src="/<%= company.qrImg %>" alt="qr-img" >
+                <% } else { %> 
+                  <p>QR Code</p>
+                <% } %>   
+              </div>
+              
+              <form class="company__form" method="POST" action="/admin/upload-qr?company=<%= company.id %>" enctype="multipart/form-data">
+                <input type="file" name="image">  
+                <input type="hidden" name="companyId" value="<%= company.id %>">
+                <button type="submit" name="button" value="upload"><i class="fas fa-upload"></i></button>
+              </form>
+              <div class="company__image__action">
+                <a href="/admin/generate-qr-code/<%= company.id %>"><i class="far fa-plus-square"></i></a> 
+                <a href="/admin/generate-qr-code/<%= company.id %>"><i class="fas fa-download"></i></a>  
+              </div>
+            </div>  
           </div>
+          
         </th>
         <% } %> 
         <th>Total</th>
@@ -32,6 +53,11 @@
 </body>
 
 <script>
+  $('.company__detail__name').click(function() {
+    const companyId = $(this).attr('dataid');
+    $('#popOver__'+companyId).toggle();
+  })
+
   $('span[name="display"]').click(function() {
     const display = $(this).attr('display');
     const monthDate = $(this).attr('data-id');
@@ -55,10 +81,6 @@
       $(this).attr('display', 'false');
       $(this).children().replaceWith('<i class="fas fa-chevron-circle-down"></i>');
     }
-    
-    
-
-    
   })
 </script>
 <%- include('./includes/end.ejs') %> 

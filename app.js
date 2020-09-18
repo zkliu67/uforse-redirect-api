@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require("express");
 const bodyParser = require('body-parser');
+const multer = require('multer');
 const mongoose = require("mongoose");
 const session = require('express-session');
 const mongodbStore = require('connect-mongodb-session')(session);
@@ -23,6 +24,29 @@ const store = new mongodbStore({
   collection: 'sessions'
 });
 
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'images')
+  },
+  filename: (req, file, cb) => {
+    let companyId = "";
+    if (req.query.company) {
+      companyId = req.query.company
+    }
+    const extension = (file.originalname).split('.')[1];
+    cb(null, "qr-img"+'-'+companyId+'.'+extension);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (!req.query.company) { cb(null, false); }
+  if (file.mimetype === 'image/png'||file.mimetype === 'image/jpg'||file.mimetype === 'image/jpeg') {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+}
+
 /% Set the view engine used in the express server %/
 app.set('view engine', 'ejs'); // set global configuration value
 app.set('views', 'views'); // Tell the express find templates in './views' folder
@@ -33,6 +57,8 @@ const sessionKey = process.env.DEPLOYED === "true" ? process.env.SESSION_KEY : r
 app.use(session({secret: sessionKey, resave: false, saveUninitialized: false, store: store}))
 // allows for form submission as json file
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image'));
+app.use('/images', express.static(path.join(__dirname, '/images')));
 
 // protect against HTTP Parameter Pollution attacks
 app.use(hpp());
@@ -69,6 +95,8 @@ app.use(function(req, res, next) {
 // setup routing
 app.use('/from', apiRoutes);
 app.use('/admin', adminRoutes);
+app.use('/', (req, res, next) => {res.redirect('/admin/all-visits');})
+
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
