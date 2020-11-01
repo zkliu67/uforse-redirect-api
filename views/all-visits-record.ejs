@@ -23,7 +23,7 @@
               <p>Contact Info: <%= company.contactName %></p>
               <p>Phone: <%= company.contactPhone %></p>
               <p>Email: <%= company.contactEmail %></p>
-              <!--<p>Link: <%= company.redirectLink %></p>-->
+              <p>Link: <a href="https://uforse-redirect-api.herokuapp.com<%= company.redirectLink %>">https://uforse-redirect-api.herokuapp.com<%= company.redirectLink %></a></p>
               <div class="company__detail__img">
                 <% if (company.qrImg) { %>
                   <img src="/<%= company.qrImg %>" alt="qr-img" >
