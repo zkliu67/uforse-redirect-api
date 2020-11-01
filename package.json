@@ -36,6 +36,9 @@
     "nodemon": "^2.0.4",
     "pdfkit": "^0.11.0",
     "request-ip": "^2.1.3",
+    "save-dev": "0.0.1-security",
+    "superagent": "^6.1.0",
+    "supertest": "^5.0.0",
     "winston": "^3.3.3"
   }
 }
